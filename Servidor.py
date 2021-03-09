@@ -30,9 +30,5 @@ while (True):
     c.send(file_data)
     print("Archivo enviado")
 
-    #Recibe la confirmacion
-    c.recv(1024)
-
-
 
     c.close()  # Cierra la conexion

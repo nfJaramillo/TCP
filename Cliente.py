@@ -32,6 +32,3 @@ while True:
 
 file.close()
 print("Archivo recibido")
-
-# Avisa al servidor de la correcta recepcion
-s.send(b"Listo")
