@@ -70,6 +70,9 @@ def escuchar (puerto):
     with threadlock:
         conexionesActuales += 1
 
+    # Recibe el listo del cliente
+    c.recv(5)
+
     # Aqui espera a que todos lo cleintes se conecten
     while conexionesActuales < cantConexiones:
         time.sleep(1)
@@ -82,8 +85,8 @@ def escuchar (puerto):
     c.send(str(os.path.getsize(nombreArchivo)).encode("utf-8"))
     c.recv(12)
 
-    # Envia la extension del archivo
-    c.send(nombreArchivo[-3:].encode("utf-8"))
+    # Envia el nombre del archivo
+    c.send(nombreArchivo.encode("utf-8"))
     c.recv(12)
 
     # Comienza a correr el tiempo de transmicion
@@ -138,7 +141,7 @@ while conexionesCompletadas < cantConexiones:
 # Se pide y formatea la fecha actual
 now = datetime.now()
 dt_string = now.strftime("%Y-%m-%d-%H-%M-%S")
-filename = "Logs/"+str(dt_string)+"-log.txt"
+filename = "Logs/"+str(dt_string)+"-logServidor.txt"
 file = open(filename, 'w')
 
 # Por cada string que representa un log de un cliente en la lista de log, lo escribira en el archivo
