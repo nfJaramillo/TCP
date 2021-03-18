@@ -35,8 +35,12 @@ def recibir (num):
     tamEsperado = int(s.recv(1024).decode("utf-8"))
     s.send(b"Tam Recibido")
 
+    # Recibe la extension del archivo
+    extension = s.recv(3).decode("utf-8")
+    s.send(b"Ext Recibida")
+
     # Crea un archivo para guardar la descarga
-    filename = "ArchivosRecibidos/Cliente"+str(num)+"-Prueba-"+str(cantClientes)+".txt"
+    filename = "ArchivosRecibidos/Cliente"+str(num)+"-Prueba-"+str(cantClientes)+"."+extension
     file = open(filename, 'wb')
 
     # Variable que cuenta el tamano del archivo que se va recibiendo

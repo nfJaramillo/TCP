@@ -14,7 +14,7 @@ port = 4000
 # Se pregunta por consola la ubicacion/nombre del archivo y luego calcula el hash
 # Si el archivo no existe vuelve a preguntar
 while True:
-    print("Escriba el nombre del archivo a transferir (Ej. test.txt)")
+    print("Escriba el nombre del archivo a transferir (Ej. 100.txt)")
     nombreArchivo = input()
     try:
         file = open(nombreArchivo, 'rb')
@@ -80,6 +80,10 @@ def escuchar (puerto):
 
     # Envia el tamano del archivo y recibe confirmacion de la recpcion
     c.send(str(os.path.getsize(nombreArchivo)).encode("utf-8"))
+    c.recv(12)
+
+    # Envia la extension del archivo
+    c.send(nombreArchivo[-3:].encode("utf-8"))
     c.recv(12)
 
     # Comienza a correr el tiempo de transmicion
