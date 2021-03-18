@@ -1,34 +1,77 @@
 import socket
+import threading
+import hashlib
 
-# Crear el socket
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
 
 # Puerto
 port = 4000
 
 # Estipula la direccion del servidor
-direccionServidor = ('localhost', port)
+print("Escriba la direccion ip del servirdor")
+ip = input()
 
-print("conectado...")
 
-# Se conecta al servidor y recibe un mensaje de saludo
-s.connect(direccionServidor)
-msg = s.recv(1024)
-print(msg)
 
-# Le dice al servidor que esta listo para recibir
-s.send(b"Listo")
 
-#Crea un archivo para guardar la descarga
-filename = "ArchivosRecibidos/re.txt"
-file = open (filename, 'wb')
-
-#Guarda la descarga por chunks
+# Estipula la cantidad de clientes
 while True:
-    data = s.recv(512)
-    if (len(data) < 1):
+    print("Escriba la cantidad de clientes, minimo 25")
+    cantClientes = int(input())
+    if (cantClientes > 0):
         break
-    file.write(data)
 
-file.close()
-print("Archivo recibido")
+clientesActuales = 0
+
+
+
+
+def recibir (num):
+    # Crear el socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    direccionServidor = (ip, port+num)
+    s.connect(direccionServidor)
+
+    hash = s.recv(1024).decode("utf-8")
+    s.send(b"Hash Recibido")
+    print("Hash Recibido")
+
+    tamEsperado = int(s.recv(1024).decode("utf-8"))
+    s.send(b"Tam Recibido")
+    print("tam: " + str(tamEsperado))
+
+    # Crea un archivo para guardar la descarga
+    filename = "ArchivosRecibidos/re"+str(num)+".txt"
+    file = open(filename, 'wb')
+
+    # Guarda la descarga por chunks
+    tam = 0
+    while True:
+        data = s.recv(512)
+        tam += len(data)
+        if (tam == tamEsperado):
+            file.write(data)
+            break
+        file.write(data)
+    file.close()
+    print("Archivo recibido")
+    # Reabrir archivo para el hash
+    file = open(filename, 'rb')
+    file_data = file.read()
+    m = hashlib.sha256()
+    m.update(file_data)
+    hash2 = m.hexdigest()
+    if(hash == hash2):
+        print("El hash es igual" + " - " +"Hash recibido: " + str(hash) + " - " + "Hash calculado: " + str(hash2) )
+        s.send(b"Archivo Recibido y verificado")
+    else:
+        print("El hash esta mal" + " - " + "Hash recibido: " + str(hash) + " - " + "Hash calculado: " + str(hash2))
+
+
+# Crea todos lo clientes
+
+while clientesActuales<cantClientes:
+    clientesActuales +=1
+    threading.Thread(target=recibir, args=(clientesActuales,)).start()
+
+
